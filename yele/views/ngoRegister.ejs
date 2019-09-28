@@ -1,0 +1,25 @@
+<% include partials/header %>
+<h1>Register your NGO</h1>
+<form action="/ngoRegister" method="post">
+
+    
+    <input type="text" name="username" placeholder="NGO Name"><br><br>
+    <label for="address">
+        Address:<br>
+        <input type="text" name="streetaddress" placeholder="street address">
+        <input type="text" name="city" placeholder="city">
+        <input type="text" name="postalcode" placeholder="postal code">
+        <input type="text" name="state" placeholder="state">
+    </label><br><br>
+    <label for="contact">
+        Contact Details:<br>
+    <input type="text" name="email" placeholder="email"><br>
+    <input type="text" name="mobile_no" placeholder="Mobile No."><br>
+    <input type="url" name="url" placeholder="Website Url">
+    </label>
+    <br><br>
+    <input type="password" name="password" placeholder="password">
+    <br><br>
+    <button>Submit</button>
+</form>
+<% include partials/footer %>
