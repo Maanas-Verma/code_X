@@ -3,6 +3,7 @@ var app=express();
 var bodyparser = require("body-parser");
 var mongoose=require("mongoose");
 var passport=require("passport");
+var passport1=require("passport");
 var localStrategy=require("passport-local");
 var localStrategy1=require("passport-local");
 var hotel=require("./models/hotel.js");
@@ -21,13 +22,20 @@ app.use(require("express-session")({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(passport1.initialize());
+app.use(passport1.session());
 
-// passport.use(new localStrategy(hotel.authenticate()));
-// passport.serializeUser(hotel.serializeUser());
-// passport.deserializeUser(hotel.deserializeUser());
-// passport.use(new localStrategy(ngo.authenticate()));
-// passport.serializeUser(ngo.serializeUser());
-// passport.deserializeUser(ngo.deserializeUser());
+function passport_hotel(){
+    passport.use(new localStrategy(hotel.authenticate()));
+    passport.serializeUser(hotel.serializeUser());
+    passport.deserializeUser(hotel.deserializeUser());
+}
+function passport_ngo(){
+    passport1.use(new localStrategy1(ngo.authenticate()));
+    passport1.serializeUser(ngo.serializeUser());
+    passport1.deserializeUser(ngo.deserializeUser());
+}
+
 
 var database=mongoose.model("database",cityschema);
 
@@ -45,12 +53,7 @@ app.get("/hotelRegister",function(req,res){
     res.render("hotelRegister")
 })
 app.post("/hotelRegister",function(req,res){
-    // app.use(passport.initialize());
-    // app.use(passport.session());
-
-    passport.use(new localStrategy(hotel.authenticate()));
-    passport.serializeUser(hotel.serializeUser());
-    passport.deserializeUser(hotel.deserializeUser());
+    passport_hotel();
     hotel.register(new hotel({
         username:req.body.username,
         hotelname:req.body.hotelname,
@@ -76,9 +79,8 @@ app.get("/ngoRegister",function(req,res){
     res.render("ngoRegister");
 })
 app.post("/ngoRegister",function(req,res){
-    passport.use(new localStrategy1(ngo.authenticate()));
-    passport.serializeUser(ngo.serializeUser());
-    passport.deserializeUser(ngo.deserializeUser());
+
+    passport_ngo();
     ngo.register(new ngo({
         // username:req.body.username,
         username:req.body.username,
@@ -96,7 +98,7 @@ app.post("/ngoRegister",function(req,res){
 
         }else{
             
-            passport.authenticate("local")(req,res,function(){
+            passport1.authenticate("local")(req,res,function(){
                 res.redirect("/city");
             });
             
@@ -108,11 +110,56 @@ app.post("/ngoRegister",function(req,res){
 app.get("/login",function(req,res){
     res.render("login");
 })
-app.post("/login",passport.authenticate("local",{
-    successRedirect:"/city",
-    failureRedirect:"/login"
-}),function(req,res){
-    // res.redirect("/city");
+// app.post("/login",passport.authenticate("local",{
+//     successRedirect:"/city",
+//     failureRedirect:"/login"
+// }),function(req,res){
+//     // res.redirect("/city");
+// })
+app.post("/login",function(req,res,next){
+    var choice=req.body.choice;
+    if (choice==="Hotel"){
+      
+        passport_hotel();
+        passport.authenticate('local', function(err, user, info) {
+            if (err) { 
+                console.log(err);
+                return next(err); }
+            if (!user) { console.log("not user"); return res.redirect('/login'); }
+            req.logIn(user, function(err) {
+              if (err) { console.log(err); return next(err); }
+              database.find({},function(err,alldata){
+                if(err){
+                    console.log("something went wrong");
+                }else{
+                    return res.render("cityr",{city:alldata,isLoggedIn:isLoggedIn,username:req.body.username});
+                }
+                });
+            //   return res.redirect("/city");
+            });
+          })(req, res, next);
+    }
+    if(choice==="NGO"){
+        passport_ngo();
+        passport1.authenticate('local', function(err, user, info) {
+            if (err) { 
+                console.log(err);
+                return next(err); }
+            if (!user) { console.log("not user"); return res.redirect('/login'); }
+            req.logIn(user, function(err) {
+              if (err) { console.log(err); return next(err); }
+              database.find({},function(err,alldata){
+                if(err){
+                    console.log("something went wrong");
+                }else{
+                    return res.render("cityr",{city:alldata,isLoggedIn:isLoggedIn,username:req.body.username});
+                }
+                });
+            //   return res.redirect("/city",{username:req.body.username});
+            });
+          })(req, res, next);
+    }        
+    
 })
 // LOGOUT ========================================
 app.get("/logout",function(req,res){
@@ -125,7 +172,7 @@ app.get("/city",function(req,res){
     if(err){
         console.log("something went wrong");
     }else{
-        res.render("cityr",{city:alldata,isLoggedIn:isLoggedIn});
+        res.render("cityr",{city:alldata,isLoggedIn:isLoggedIn,username:""});
     }
     });
 });
@@ -155,6 +202,28 @@ function isLoggedIn(req,res,next){
     }
     res.redirect("/login");
 }
+
+// app.get("/notification",function(req,res,next){
+//     passport_hotel();
+//     passport.authenticate('local', function(err, user, info) {
+//         if (err) { 
+//             console.log(err);
+//             return next(err); }
+//         if (!user) { console.log("not user"); return res.redirect('/login'); }
+//         req.logIn(user, function(err) {
+//           if (err) { console.log(err); return next(err); }
+//           console.log(user.username);
+//         //   return res.redirect("/city",{username:req.body.username});
+//         });
+//       })(req, res, next);
+
+// })
+
+app.post("/notification",function(req,res){
+    var username=req.body.username;
+    // console.log(username);
+    ngo.
+})
 
 app.listen(localhost=3000,function(){
     console.log('server is running ...');

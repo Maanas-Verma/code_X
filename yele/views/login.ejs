@@ -1,6 +1,11 @@
 <% include partials/header %>
 <h1>LOGIN:</h1>
 <form action="/login" method="post">
+    <select name="choice" required>
+        <!-- <option>Select Category</option> -->
+        <option>NGO</option>
+        <option>Hotel</option>
+    </select>    
     <input type="text" name="username" placeholder="username"><br><br>
     <input type="password" name="password" placeholder="password"><br><br>
     <button>Submit</button>
