@@ -1,0 +1,30 @@
+<% include partials/header %>
+<div class="container">
+   <header class="jumbotron" style="background-color: darkorchid">
+    <div class="container" >
+      <h1 style="font-size: 60px">Hey welcome to the city page...</h1>
+      <h4>here are the cities around the world</h4>
+      <a class="btn btn-primary btn-large " href="/city/new">add new city</a>
+    </div>
+    <form action="/citys" method="POST">
+    <input class="form-control" style="height:40px;margin-top: 10px" type="text" name='see'  placeholder="search">
+    </form>
+   </header>
+   
+   <div class='row' style="background-color: deepskyblue">
+    <% city.forEach(function(city){ %>
+        <div class="col-md-4 col-sm-6">
+            <div class="thumbnail" style="margin-top: 40px" >
+                <img src="<%= city.image %>"  style="width:350px;height:280px">
+                <div class="caption" style="background-color: white">
+                   <h4 style="font-family:cursive"><%= city.name %></h4>
+                </div>
+            </div>
+        </div>        
+    <% }); %>
+    </div>
+  
+      
+   
+</div>
+<% include partials/footer %>
